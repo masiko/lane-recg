@@ -4,5 +4,5 @@ project(video-cap)
 
 set(CMAKE_CXX_FLAGS_RELEASE)
 find_package(OpenCV REQUIRED)
-add_executable(Side-Recog main.cpp)
-target_link_libraries(Side-Recog ${OpenCV_LIBS})
+add_executable(lane-rcog main.cpp)
+target_link_libraries(lane-recog ${OpenCV_LIBS})

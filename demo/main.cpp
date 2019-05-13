@@ -16,7 +16,7 @@ int main() {
 #ifdef USECAM
 	cap.open(0);
 #else
-	cap.open("00010003.AVI");
+	cap.open("00000007.AVI");
 #endif
 	edge.create(240, 320, CV_8UC1);
 	edge_lane.create(240, 320, CV_8UC1);
@@ -40,14 +40,14 @@ int main() {
 		FillLaneArea(edge, edge_lane);
 
 		lane_area = edge_lane.clone();
-		InterpolationLaneArea(edge_lane, lane_area);
+		InterpolationLaneArea(edge, edge_lane, lane_area);
 		
 		//Canny(edge_line, dst, 50, 200, 3);	
 
 		cv::imshow("edge",edge);
 		cv::imshow("edge_lane",edge_lane);
 		cv::imshow("lane_area",lane_area);
-		if (cv::waitKey(100)!=255)	break;	//opencv2.4 waitkey() returned -1 when don't press key, but 3.2 return 255!!!!
+		if (cv::waitKey(30)!=255)	break;	//opencv2.4 waitkey() returned -1 when don't press key, but 3.2 return 255!!!!
 	}
 
 	return 0;

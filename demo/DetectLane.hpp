@@ -58,8 +58,8 @@ int FillLaneArea(cv::Mat in, cv::Mat out) {
 		flagp = true;
 		flagm = true;
 		for(int j=1; j<in.cols; j++) {
-			posp = y + cx + j;
-			posm = y + cx - j;
+			posp = y + cx + j - 1;
+			posm = y + cx - j + 1;
 			if ((cx + j) < in.cols && in.data[posp] < 100 && flagp)
 				out.data[posp] = 255;
 			else	flagp = false;
@@ -71,12 +71,14 @@ int FillLaneArea(cv::Mat in, cv::Mat out) {
 	return 0;
 }
 
-int InterpolationLaneArea(cv::Mat in, cv::Mat out) {
-	const int upper_limit = 140;
+int InterpolationLaneArea(cv::Mat in0, cv::Mat in, cv::Mat out) {
 	int y0 = 0;
 	int y1 = 0;
-//	cv::Mat map;
-//	map.create(in.rows, in.cols, CV_8UC1);
+	const int upper_limit = 150;
+	const int cx = 170;
+	const int cy = 239;
+	int posp, posm;
+	bool flagp, flagm;
 	
 	for(int i=upper_limit; i<in.rows; i++) {
 		y0 = in.cols*(i-1);
@@ -92,9 +94,33 @@ int InterpolationLaneArea(cv::Mat in, cv::Mat out) {
 		y0 = in.cols*(i+1);
 		y1 = in.cols*i;
 		for(int j=0; j<in.cols; j++) {
-			if (in.data[y1 + j] == 0 && out.data[y1 + j] > 0 
-				&& (in.data[y0 + j] > 0 || out.data[y0 + j])) {
-				out.data[y1 + j] = 255;
+			if (in.data[y1 + j] == 0 && out.data[y1 + j] > 0 && (in.data[y0 + j] > 0 ||  out.data[y0 + j] > 0)) {
+				out.data[y1 + j] = 200;
+			}
+			else if (in.data[y1 + j] == 0 && out.data[y1 + j] == 0 && (in.data[y0 + j] > 0 ||  out.data[y0 + j] > 0)) {
+				out.data[y1 + j] = 100;
+			}
+		}
+	}
+
+	for(int i=in0.rows-1; i>=upper_limit; i--) {
+		y1 = in0.cols*i;
+		flagp = true;
+		flagm = true;
+		for(int j=1; j<in0.cols; j++) {
+			posp = y1 + cx + j - 1;
+			posm = y1 + cx - j + 1;
+			if ((cx + j) < in0.cols && out.data[posp] == 100 && in0.data[posp] > 0 && flagp) {
+				for (int k=0; k<j; k++) {
+					out.data[posp-k] = 255;
+				}
+				flagp = false;
+			}
+			if ((cx - j) >= 0 && out.data[posm] == 100 && in0.data[posm] > 0 && flagm) {
+				for (int k=0; k<j; k++) {
+					out.data[posm+k] = 255;
+				}
+				flagm = false;
 			}
 		}
 	}
